@@ -22,7 +22,7 @@
     (if (not (has-vertex? G v))
 	empty-graph
 	(let ((seen (make-hash-table))
-	      (tree empty-graph))
+	      (tree (vertex v)))
 	  (hashtable-set! seen v #t)
 	  (let loop ((Q (q:snocq q:empty v)))
 	    (unless (q:empty? Q)

@@ -46,6 +46,25 @@
 
 ;;; Manipulation
 
+(define insert-vertex
+  (lambda (v G)
+    (t:insert-with s:union v s:empty-set G)))
+
+(define insert-edge
+  (lambda (u v G)
+    (t:insert-with s:union u (s:singleton v) G)))
+
+(define transpose
+  (lambda (G)
+    (t:tree-ifold-right (lambda (v vs G*)
+			  (overlay G*
+				   (s:set-fold-right (lambda (u G)
+						       (insert-edge u v G))
+						     empty-graph
+						     vs)))
+			empty-graph
+			G)))
+
 (define remove-self-loops
   (lambda (G)
     (t:tree-imap s:delete G)))
@@ -67,9 +86,16 @@
 
 (define edges
   (lambda (es)
-    (apply overlays (map (lambda (uv)
-			   (edge (car uv) (cdr uv)))
-			 es))))
+    (fold-right (lambda (uv G)
+		  (t:insert-with s:union
+				 (car uv)
+				 (s:singleton (cdr uv))
+				 (t:insert-with s:union
+						(cdr uv)
+						s:empty-set
+						G)))
+		empty-graph
+		es)))
 
 (define circuit
   (lambda (vs)
@@ -110,13 +136,23 @@
   (lambda (v G)
     (t:lookup-with-default v s:empty-set G)))
 
+(define pre-set
+  (lambda (v G)
+    (t:tree-ifold-right (lambda (u E-u E-pre-v)
+			  (if (s:member? v E-u)
+			      (s:insert u E-pre-v)
+			      E-pre-v))
+		       s:empty-set
+		       G)))
+
 (define adjacent
   (lambda (v G)
     (s:set->list (post-set v G))))
 
 (define has-vertex?
   (lambda (G v)
-    (t:lookup-with-default v #f G)))
+    (and (t:lookup-with-default v #f G)
+	 #t)))
 
 (define vertex-count
   (lambda (G)
