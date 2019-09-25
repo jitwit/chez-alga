@@ -12,7 +12,7 @@
 	    (for-each (lambda (y)
 			(unless (hashtable-ref seen y #f)
 			  (hashtable-set! seen y #t)
-			  (set! tree (overlay (edge x y) tree))
+			  (set! tree (insert-edge x y tree))
 			  (loop y)))
 		      (adjacent x G)))
 	  tree))))
@@ -32,7 +32,7 @@
 				   (cond ((hashtable-ref seen y #f) Q)
 					 (else
 					  (hashtable-set! seen y #t)
-					  (set! tree (overlay (edge x y) tree))
+					  (set! tree (insert-edge x y tree))
 					  (q:snocq Q y))))
 				 (q:tailq Q)
 				 (adjacent x G))))))

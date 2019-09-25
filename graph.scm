@@ -48,11 +48,20 @@
 
 (define insert-vertex
   (lambda (v G)
+    (check-vertex v)
     (t:insert-with s:union v s:empty-set G)))
 
 (define insert-edge
   (lambda (u v G)
-    (t:insert-with s:union u (s:singleton v) G)))
+    (check-vertex u)
+    (check-vertex v)
+    (t:insert-with s:union
+		   u
+		   (s:singleton v)
+		   (t:insert-with s:union
+				  v
+				  s:empty-set
+				  G))))
 
 (define transpose
   (lambda (G)
@@ -80,6 +89,7 @@
 (define vertices
   (lambda (vs)
     (fold-right (lambda (v G)
+		  (check-vertex v)
 		  (t:insert v s:empty-set G))
 		t:empty-tree
 		vs)))
@@ -87,6 +97,8 @@
 (define edges
   (lambda (es)
     (fold-right (lambda (uv G)
+		  (check-vertex (car uv))
+		  (check-vertex (cdr uv))
 		  (t:insert-with s:union
 				 (car uv)
 				 (s:singleton (cdr uv))
